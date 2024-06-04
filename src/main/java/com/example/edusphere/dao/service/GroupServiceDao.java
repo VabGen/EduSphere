@@ -1,6 +1,9 @@
 package com.example.edusphere.dao.service;
 
 import com.example.edusphere.dao.entity.Group;
+import com.example.edusphere.model.filter.GroupFilter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.UUID;
@@ -9,13 +12,13 @@ public interface GroupServiceDao {
 
     Group create(Group group);
 
-    List<Group> read();
+    List<Group> findAll();
 
-    Group update(Group group);
+    Group edit(Group group);
 
     void delete(UUID id);
 
     Group findById(UUID id);
 
-//    List<Group> filter(GroupFilter filter, Pageable pageable);
+    Page<Group> findAll(GroupFilter filter, Pageable pageable);
 }

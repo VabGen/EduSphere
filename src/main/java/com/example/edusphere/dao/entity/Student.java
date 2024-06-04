@@ -12,14 +12,14 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "students")
+@Table(name = "student")
 public class Student implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "uuid-generator")
     private UUID id;
 
     @Column(name = "first_name", nullable = false)
@@ -37,10 +37,13 @@ public class Student implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "gender_type", nullable = false)
     @NotBlank(message = "The gender type cannot be empty")
-    private GenderType genderType;
+    private GenderType gender;
 
     @Column(name = "dismissed", columnDefinition = "bool default false")
     private boolean dismissed;
+
+    @Column(name = "leader", columnDefinition = "bool default false")
+    private boolean leader;
 
     @CreationTimestamp
     private Instant enrollmentDate;
@@ -48,22 +51,27 @@ public class Student implements Serializable {
     @UpdateTimestamp
     private Instant modificationDate;
 
-    @ManyToOne
-    @JoinColumn(name = "group_id", referencedColumnName = "id")
+    @Column(name = "group_id")
+    private UUID groupId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_id", referencedColumnName = "id", insertable = false, updatable = false)
     private Group group;
 
     public Student() {
     }
 
-    public Student(String firstName, String middleName, String lastName, GenderType genderType,
-                   boolean dismissed, Instant enrollmentDate, Instant modificationDate) {
+    public Student(String firstName, String middleName, String lastName, GenderType gender, boolean dismissed,
+                   boolean leader, Instant enrollmentDate, Instant modificationDate, UUID groupId) {
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
-        this.genderType = genderType;
+        this.gender = gender;
         this.dismissed = dismissed;
+        this.leader = leader;
         this.enrollmentDate = enrollmentDate;
         this.modificationDate = modificationDate;
+        this.groupId = groupId;
     }
 
     public UUID getId() {
@@ -98,12 +106,12 @@ public class Student implements Serializable {
         this.lastName = lastName;
     }
 
-    public GenderType getGenderType() {
-        return genderType;
+    public GenderType getGender() {
+        return gender;
     }
 
-    public void setGenderType(GenderType genderType) {
-        this.genderType = genderType;
+    public void setGender(GenderType genderType) {
+        this.gender = genderType;
     }
 
     public boolean isDismissed() {
@@ -128,5 +136,29 @@ public class Student implements Serializable {
 
     public void setModificationDate(Instant modificationDate) {
         this.modificationDate = modificationDate;
+    }
+
+    public UUID getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(UUID groupId) {
+        this.groupId = groupId;
+    }
+
+    public Group getGroup() {
+        return group;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
+    }
+
+    public boolean isLeader() {
+        return leader;
+    }
+
+    public void setLeader(boolean leader) {
+        this.leader = leader;
     }
 }

@@ -1,10 +1,14 @@
 package com.example.edusphere.controller;
 
 import com.example.edusphere.controller.model.request.TeacherRequest;
-
 import com.example.edusphere.dto.model.TeacherDto;
+import com.example.edusphere.model.filter.TeacherFilter;
 import com.example.edusphere.service.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +32,7 @@ public class TeacherController {
 
     @PutMapping
     public ResponseEntity<TeacherDto> update(@RequestBody TeacherRequest request) {
-        TeacherDto updatedTeacher = teacherService.update(request);
+        TeacherDto updatedTeacher = teacherService.edit(request);
         return ResponseEntity.ok(updatedTeacher);
     }
 
@@ -44,11 +48,11 @@ public class TeacherController {
         return ResponseEntity.ok(findTeacher);
     }
 
-//    @GetMapping
-//    public ResponseEntity<List<TeacherDto>> filter(@ModelAttribute TeacherFilter filter,
-//                                                    @RequestParam(defaultValue = "0") int page,
-//                                                    @RequestParam(defaultValue = "1000") int size) {
-//        List<TeacherDto> filterTeacher = teacherService.filter(filter, page, size);
-//        return ResponseEntity.ok(filterTeacher);
-//    }
+    @GetMapping
+    public ResponseEntity<Page<TeacherDto>> filter(@ModelAttribute TeacherFilter filter,
+                                                   @PageableDefault(sort = {"lastName"}, direction = Sort.Direction.ASC)
+                                                   Pageable pageable) {
+        Page<TeacherDto> filterTeacher = teacherService.findAll(filter, pageable);
+        return ResponseEntity.ok(filterTeacher);
+    }
 }

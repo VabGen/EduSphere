@@ -9,17 +9,18 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "teachers")
+@Table(name = "teacher")
 public class Teacher implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "uuid-generator")
     private UUID id;
 
     @Column(name = "first_name", nullable = false)
@@ -37,10 +38,13 @@ public class Teacher implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "gender_type", nullable = false)
     @NotBlank(message = "The gender type cannot be empty")
-    private GenderType genderType;
+    private GenderType gender;
 
     @Column(name = "dismissed", columnDefinition = "bool default false")
     private boolean dismissed;
+
+    @Column(name = "curator", columnDefinition = "bool default false")
+    private boolean curator;
 
     @CreationTimestamp
     private Instant hireDate;
@@ -48,18 +52,31 @@ public class Teacher implements Serializable {
     @UpdateTimestamp
     private Instant modificationDate;
 
+    @OneToMany(mappedBy = "curator")
+    private List<Group> groups;
+
+    @Column(name = "subject_id")
+    private UUID subjectId;
+
+    @OneToMany(mappedBy = "teacher", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<TeacherSubject> subjects;
+
     public Teacher() {
     }
 
-    public Teacher(String firstName, String middleName, String lastName, GenderType genderType,
-                   boolean dismissed, Instant hireDate, Instant modificationDate) {
+    public Teacher(String firstName, String middleName, String lastName, GenderType gender, boolean dismissed,
+                   boolean curator, Instant hireDate, Instant modificationDate, UUID subjectId,
+                   List<TeacherSubject> subjects) {
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
-        this.genderType = genderType;
+        this.gender = gender;
         this.dismissed = dismissed;
+        this.curator = curator;
         this.hireDate = hireDate;
         this.modificationDate = modificationDate;
+        this.subjectId = subjectId;
+        this.subjects = subjects;
     }
 
     public UUID getId() {
@@ -94,12 +111,12 @@ public class Teacher implements Serializable {
         this.lastName = lastName;
     }
 
-    public GenderType getGenderType() {
-        return genderType;
+    public GenderType getGender() {
+        return gender;
     }
 
-    public void setGenderType(GenderType genderType) {
-        this.genderType = genderType;
+    public void setGender(GenderType genderType) {
+        this.gender = genderType;
     }
 
     public boolean isDismissed() {
@@ -126,5 +143,35 @@ public class Teacher implements Serializable {
         this.modificationDate = modificationDate;
     }
 
-}
+    public UUID getSubjectId() {
+        return subjectId;
+    }
 
+    public void setSubjectId(UUID subjectId) {
+        this.subjectId = subjectId;
+    }
+
+    public List<TeacherSubject> getSubjects() {
+        return subjects;
+    }
+
+    public void setSubjects(List<TeacherSubject> subjects) {
+        this.subjects = subjects;
+    }
+
+    public List<Group> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
+    }
+
+    public boolean isCurator() {
+        return curator;
+    }
+
+    public void setCurator(boolean curator) {
+        this.curator = curator;
+    }
+}
